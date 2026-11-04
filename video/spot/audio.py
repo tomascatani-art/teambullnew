@@ -277,12 +277,12 @@ def build():
     sfx.add(T["pop"], cork_pop(), 1.0)
     sfx.add(0.0, whoosh(0.5, 400, 2500, 0, 0), 0.5)
     sfx.add(T["hook_boom"], boom(1.2), 1.0)
-    sfx.add(T["hook_boom"], liquid(0.5, 40), 0.45)
+    sfx.add(0.36, whoosh(0.3, 150, 1200, 0, 0), 0.7)  # el corcho pasa pegado a la lente
     music.add(0.5, pad((D2, A2, D3), 2.0, 700, 0.6, 0.4), 0.9)
     for k in range(16):  # tic-tac que acelera la tensión
         drums.add(0.5 + k * 0.125, hat(), 0.15 + 0.35 * k / 16, pan=0.3 * (-1) ** k)
     sfx.add(1.3, riser(1.2), 0.35)
-    sfx.add(2.35, whoosh(0.35, 600, 5000, 0, 0), 0.5)  # letras que atraviesan la cámara
+    sfx.add(2.5, impact(0.5), 0.3)  # zoom punch
 
     # DESARROLLO 2.5 - 16.5
     t = 2.5
@@ -305,13 +305,12 @@ def build():
         t += beat
     sfx.add(T["whip1"] - 0.2, whoosh(0.42, 300, 4000, -0.9, 0.9), 0.9)
     sfx.add(6.1, riser(0.37), 0.35); sfx.add(T["zoom_through"], boom(0.5), 0.6)
-    sfx.add(8.05, whoosh(0.5, 1200, 7000, -0.5, 0.7), 0.6); sfx.add(8.05, shimmer(0.6, 30), 1.0)
+    sfx.add(8.05, whoosh(0.5, 400, 2500, -0.5, 0.5), 0.35); sfx.add(8.1, shimmer(0.5, 16), 0.6)  # luz que se filtra
     sfx.add(T["match"], impact(1.0), 0.75)
-    sfx.add(12.05, liquid(0.65, 80), 0.9); sfx.add(12.05, whoosh(0.6, 200, 1500, 0.3, -0.3), 0.4)
+    sfx.add(12.05, whoosh(0.6, 250, 4500, -0.8, 0.8), 0.85)  # giro de cámara
     sfx.add(T["glint"] - 0.05, clink(), 0.55); sfx.add(T["glint"], shimmer(0.5, 18, 5000, 11000), 0.8)
     sfx.add(15.45, reverse_cymbal(0.55), 0.6)
-    sfx.add(T["portal"], clink(1900), 0.5); sfx.add(T["portal"], boom(0.6), 0.6)
-    sfx.add(16.0, whoosh(0.55, 300, 6000, 0, 0), 0.5)
+    sfx.add(15.95, whoosh(0.6, 200, 1500, 0, 0), 0.3)  # cambio de foco
 
     # MOMENTO WOW 16.5 - 22.25: todo más denso
     t = 16.5
@@ -330,12 +329,12 @@ def build():
         if bar_pos in (0, 2):
             music.add(t, stab([n * 2 for n in notes[:3]]), 0.55)
         t += beat
-    sfx.add(17.2, riser(0.25), 0.3); sfx.add(T["bloom"], impact(0.8), 0.6)
+    sfx.add(17.2, riser(0.25), 0.3); sfx.add(T["bloom"], impact(0.8), 0.45)
     sfx.add(T["whip2"] - 0.2, whoosh(0.4, 250, 3500, 0, 0), 0.8)
-    sfx.add(19.1, whoosh(0.7, 200, 2500, -0.6, 0.6), 0.5); sfx.add(19.15, wood_ticks(0.9), 0.8)
-    sfx.add(T["slices"] - 0.15, whoosh(0.35, 500, 5000, 0.9, -0.9), 0.7)
-    sfx.add(T["chroma"], impact(1.3), 0.85)
-    sfx.add(21.9, reverse_cymbal(0.4), 0.5); sfx.add(T["burn"] - 0.25, boom(0.8), 0.6)
+    sfx.add(19.25, whoosh(0.55, 120, 900, -0.9, 0.9), 0.9)  # columna que pasa frente a la lente
+    sfx.add(20.2, riser(0.25), 0.4)  # rampa de velocidad
+    sfx.add(T["chroma"], impact(1.2), 0.7)  # zoom punch
+    sfx.add(21.9, reverse_cymbal(0.4), 0.4)  # disolución al plano héroe
 
     # RESPIRO 22.5 - 24.5: campanas sobre el plano héroe
     music.add(22.25, pad((D3, F3, A3, D4), 2.4, 900, 0.3, 1.0), 0.9)
@@ -368,7 +367,7 @@ def build():
         step = 0.25 if t < 29.5 else (0.125 if t < 30.0 else 0.0625)
         t += step
     sfx.add(28.5, riser(1.92), 0.55)
-    sfx.add(29.85, liquid(0.6, 90), 0.8)
+    sfx.add(29.9, reverse_cymbal(0.55), 0.45)  # fundido a negro antes del golpe
 
     # CIERRE: golpe final, acorde amplio y brillo sobre el logo
     sfx.add(T["wine_rise"] + 0.05, boom(1.6), 1.1)
