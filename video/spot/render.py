@@ -335,8 +335,8 @@ def sec_1370(t):
     return kinetic(f, t, 2.72, 3.95, "VINOS", 1330, 250, SERIF, 0.18), 0.32
 
 
-LEAKS = [(-200, 1500, 900, 300, 520, (1.0, 0.55, 0.18), 1.0), (1300, 200, 200, 1400, 420, (1.0, 0.78, 0.42), 0.8),
-         (500, 2200, 700, -200, 600, (0.85, 0.22, 0.12), 0.6)]
+LEAKS = [(-300, 1600, 1000, 200, 700, (0.95, 0.45, 0.16), 0.55), (1400, 100, 100, 1500, 560, (0.9, 0.62, 0.32), 0.4),
+         (500, 2300, 600, -300, 800, (0.7, 0.16, 0.10), 0.4)]
 LY4, LX4 = np.mgrid[0:H // 4, 0:W // 4].astype(np.float32) * 4
 
 
@@ -355,7 +355,7 @@ def light_leak(t):
     fb = S["s1353"].view(t - 8.05, 1.04) * LOWER
     mix = ease_io((u - 0.3) / 0.4)
     f = np.clip(fa * (1 - mix) + fb * mix, 0, 1)
-    L = np.clip(leak_layer(u) * math.sin(math.pi * u) ** 1.2 * 1.1, 0, 1)
+    L = np.clip(leak_layer(u) * math.sin(math.pi * u) ** 1.4 * 0.8, 0, 1)
     return 1 - (1 - f) * (1 - L), 0.45
 
 
@@ -417,7 +417,7 @@ def lamp_bloom(t):
     fa = S["s1366"].view(t - 15.95, 1.0 + 0.04 * (t - 16.55))
     fb = S["s1360"].view(t - 17.3, 1.06 - 0.06 * ease_out(u))
     mix = ease_io((u - 0.35) / 0.3)
-    return (fa * (1 - mix) + fb * mix) * (1 + 1.6 * k), 0.35 + 0.9 * k
+    return (fa * (1 - mix) + fb * mix) * (1 + 0.7 * k), 0.35 + 0.5 * k
 
 
 def sec_1360(t):
@@ -443,7 +443,7 @@ def pass_by(t):
     reveal = np.clip((xc - x) / 6 + 0.5, 0, 1)[None, :, None]
     f = fa * (1 - reveal) + fb * reveal
     shade = np.clip((560 - np.abs(x - xc)) / 220, 0, 1)[None, :, None] * 0.35
-    a = np.clip((380 - np.abs(x - xc)) / 140 + 0.5, 0, 1)[None, :, None]
+    a = np.clip((380 - np.abs(x - xc)) / 230 + 0.5, 0, 1)[None, :, None]
     f = f * (1 - shade)
     return f * (1 - a) + BAR * a, 0.3
 
