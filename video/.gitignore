@@ -1,3 +1,5 @@
 .work*/
 *.mp4
 *.jpg
+*.wav
+__pycache__/
