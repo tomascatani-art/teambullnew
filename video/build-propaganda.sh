@@ -12,7 +12,7 @@ BOLD=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf
 WINE=0x7B1E3A
 rm -rf "$WORK"; mkdir -p "$WORK"
 
-ENDCARD=3.6
+ENDCARD=4.2
 
 # nombre|inicio|duración|texto (vacío = sin texto)
 SHOTS=(
@@ -25,7 +25,7 @@ SHOTS=(
   "IMG_1353|0.6|1.5|CAJAS PARA REGALAR"
   "IMG_1355|0.6|1.0|"
   "IMG_1374|0.6|1.5|COPAS Y ACCESORIOS"
-  "IMG_1376|0.6|1.1|"
+  "IMG_1376|0.6|1.4|ENVÍOS A DOMICILIO"
   "IMG_1366|0.6|1.0|"
   "IMG_1380|1.0|2.4|TE ESPERAMOS"
 )
@@ -63,8 +63,11 @@ done
 ffmpeg -v error -y -f lavfi -t "$ENDCARD" -i "color=c=0x14070B:s=1080x1920:r=30" -loop 1 -t "$ENDCARD" -i "$WORK/logo.png" -filter_complex "
   [0]vignette=PI/4[bg];
   [1]fade=in:st=0:d=0.4:alpha=1[l];
-  [bg][l]overlay=(W-w)/2:'520+max(0\,(0.4-t))*300':format=auto,
-  $(banner 'VENÍ A CONOCERNOS' 66 1250 0.6),
+  [bg][l]overlay=(W-w)/2:'420+max(0\,(0.4-t))*300':format=auto,
+  $(banner 'VENÍ A CONOCERNOS' 62 1110 0.5),
+  drawtext=fontfile=$BOLD:text='@estilovinos':fontsize=58:fontcolor=white:x=(w-text_w)/2:y=1250:alpha='min(1\,max(0\,(t-0.9)/0.2))',
+  drawtext=fontfile=$BOLD:text='INDEPENDENCIA 1001':fontsize=44:fontcolor=white@0.85:x=(w-text_w)/2:y=1345:alpha='min(1\,max(0\,(t-1.2)/0.2))',
+  drawtext=fontfile=$BOLD:text='ENVÍOS A DOMICILIO':fontsize=44:fontcolor=0xE8B4C0:x=(w-text_w)/2:y=1410:alpha='min(1\,max(0\,(t-1.5)/0.2))',
   format=yuv420p" -c:v libx264 -crf 16 -preset medium -an "$WORK/99_end.mp4"
 echo "cierre listo"
 
