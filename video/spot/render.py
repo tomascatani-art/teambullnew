@@ -592,7 +592,8 @@ def logo_scene(t):
     f = kinetic(f, t, 32.3, 99, "ENVÍOS A DOMICILIO", 1270, 50, SERIF, 0.34)
     f = kinetic(f, t, 32.6, 99, "@estilovinos", 1365, 80, SERIF, 0.04, sweep=False, color=np.array([0.97, 0.95, 0.92], np.float32))
     f = kinetic(f, t, 32.9, 99, "INDEPENDENCIA 1001", 1455, 44, SERIF, 0.32, sweep=False, color=np.array([0.85, 0.80, 0.74], np.float32))
-    f = f + np.array([1, 0.85, 0.7], np.float32) * 0.5 * math.exp(-max(0, t - 30.5) / 0.08) * (t >= 30.45)
+    if t >= 30.5:  # destello dorado breve en el golpe final
+        f = f + np.array([0.9, 0.7, 0.4], np.float32) * 0.28 * math.exp(-(t - 30.5) / 0.05)
     f = f * (1 - ease_in((t - 35.5) / 0.5, 1.5))
     return f, 0.4
 
@@ -634,10 +635,11 @@ def main():
         return
     out = sys.argv[1]
     n = int(DURATION * FPS)
+    first = int(sys.argv[2]) if len(sys.argv) > 2 else 0  # permite re-renderizar solo desde un cuadro
     enc = subprocess.Popen(["ffmpeg", "-v", "error", "-y", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}",
                             "-r", str(FPS), "-i", "-", "-c:v", "libx264", "-crf", "17", "-preset", "medium",
                             "-pix_fmt", "yuv420p", out], stdin=subprocess.PIPE)
-    for i in range(n):
+    for i in range(first, n):
         t = i / FPS
         f, bl = frame_at(t)
         f = finish(f, i, bl)
