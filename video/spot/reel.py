@@ -158,7 +158,7 @@ def back_out(u, s=1.9):
 
 def wine_grad(h, w):
     y = np.linspace(0, 1, h, dtype=np.float32)[:, None, None]
-    top = np.array([0.72, 0.16, 0.40], np.float32); bot = np.array([0.32, 0.03, 0.14], np.float32)
+    top = np.array([0.58, 0.08, 0.15], np.float32); bot = np.array([0.30, 0.03, 0.07], np.float32)  # bordó
     return np.broadcast_to(top * (1 - y) + bot * y, (h, w, 3)).copy()
 
 
@@ -188,15 +188,15 @@ def word(f, t, t0, t1, text, path, size, cx, cy, color="white", track=0.0, shado
 
 
 def make_check(size=170):
-    """Ícono 3D: cuadrado redondeado bordó brillante con un check blanco y resplandor."""
+    """Ícono 3D: cuadrado redondeado bordó brillante con check y resplandor dorados."""
     s = size * 2
     img = Image.new("RGBA", (s, s), (0, 0, 0, 0))
     pad = int(s * 0.18)
     body = Image.new("L", (s, s), 0)
     ImageDraw.Draw(body).rounded_rectangle([pad, pad, s - pad, s - pad], radius=int(s * 0.17), fill=255)
     y = np.linspace(0, 1, s, dtype=np.float32)[:, None]
-    col = np.dstack([0.93 - 0.35 * y, 0.22 - 0.14 * y, 0.52 - 0.22 * y]) * np.ones((1, s, 1), np.float32)
-    gloss = np.clip(1 - y / 0.42, 0, 1) * 0.35
+    col = np.dstack([0.62 - 0.30 * y, 0.09 - 0.06 * y, 0.16 - 0.09 * y]) * np.ones((1, s, 1), np.float32)
+    gloss = np.clip(1 - y / 0.42, 0, 1) * 0.22
     col = np.clip(col + gloss[..., None] if gloss.ndim == 2 else col, 0, 1)
     glow = np.asarray(body.filter(ImageFilter.GaussianBlur(s * 0.08)), np.float32) / 255
     a_body = np.asarray(body, np.float32) / 255
@@ -204,8 +204,9 @@ def make_check(size=170):
     ImageDraw.Draw(chk).line([(s * 0.36, s * 0.52), (s * 0.46, s * 0.62), (s * 0.66, s * 0.40)], fill=255,
                              width=int(s * 0.045), joint="curve")
     a_chk = np.asarray(chk.filter(ImageFilter.GaussianBlur(1)), np.float32) / 255
-    rgb = col * a_body[..., None] + np.array([1.0, 0.35, 0.65], np.float32) * (glow * (1 - a_body))[..., None]
-    rgb = rgb * (1 - a_chk[..., None]) + a_chk[..., None]
+    gold = np.array([0.95, 0.78, 0.45], np.float32)
+    rgb = col * a_body[..., None] + gold * (glow * (1 - a_body))[..., None]
+    rgb = rgb * (1 - a_chk[..., None]) + gold * a_chk[..., None]
     alpha = np.clip(a_body + glow * 0.7, 0, 1)
     rgba = np.dstack([np.clip(rgb, 0, 1), alpha])
     return Image.fromarray((rgba * 255).astype(np.uint8), "RGBA").resize((size, size), Image.LANCZOS)
@@ -227,7 +228,7 @@ def draw_icons(f, t):
         pts = [(x / 2, y / 2) for x, y in TRAIL[:max(2, int(len(TRAIL) * prog))]]
         ImageDraw.Draw(layer).line(pts, fill=255, width=26, joint="curve")
         tr = np.asarray(layer.filter(ImageFilter.GaussianBlur(9)).resize((W, H), Image.BILINEAR), np.float32) / 255
-        f = 1 - (1 - f) * (1 - tr[..., None] * np.array([1.0, 0.35, 0.62], np.float32) * 0.85 * fade)
+        f = 1 - (1 - f) * (1 - tr[..., None] * np.array([1.0, 0.78, 0.45], np.float32) * 0.75 * fade)
     for x, y, ang, t0 in ICONS:
         if t < t0:
             continue

@@ -3,3 +3,4 @@
 *.jpg
 *.wav
 __pycache__/
+!ia/*.jpg
