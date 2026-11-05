@@ -36,6 +36,12 @@ def glitch_sfx(dur=0.3):
     return highpass(out, 200) * env * 0.45
 
 
+def pluck(f, dur=0.2):
+    t = tt(dur + 0.25)
+    s = (2 * ((f * t) % 1) - 1) * 0.6 + (2 * ((f * 1.005 * t) % 1) - 1) * 0.4
+    return lowpass(s, 2800, 2) * np.exp(-t / 0.13) * 0.5
+
+
 CHORDS = [(73.42, (146.83, 174.61, 220.0, 293.66)), (58.27, (116.54, 146.83, 174.61, 233.08)),
           (87.31, (174.61, 220.0, 261.63, 349.23)), (65.41, (130.81, 164.81, 196.0, 261.63))]
 
@@ -75,12 +81,17 @@ def build():
             music.add(t, pad(notes, 2.0, 2000), 0.75)
             music.add(t, stab([n * 2 for n in notes[:3]]), 0.5)
         music.add(t, bass(root, 0.2), 0.5); music.add(t + 0.25, bass(root * 2, 0.2), 0.4)
+        arp = [notes[0] * 2, notes[1] * 2, notes[2] * 2, notes[3] * 2]
+        for j in range(4):  # melodía arpegiada en semicorcheas
+            music.add(t + j * 0.125, pluck(arp[(k * 4 + j) % 4 if j != 3 else (k + 1) % 4]), 0.32, pan=0.35 * (-1) ** j)
         t += beat
     # transiciones: barridos y golpes de corte
-    for tc, (f0, f1, p0, p1) in {3.6: (300, 3500, 0, 0), 6.4: (300, 3500, 0, 0), 7.8: (300, 4000, -0.7, 0.7),
+    for tc, (f0, f1, p0, p1) in {3.6: (300, 3500, 0, 0), 5.6: (300, 3800, -0.9, 0.9), 6.4: (300, 3500, 0, 0),
+                                 7.8: (300, 4000, -0.7, 0.7), 8.4: (300, 4000, 0.7, -0.7),
                                  10.2: (250, 3800, -0.9, 0.9)}.items():
         sfx.add(tc - 0.18, whoosh(0.36, f0, f1, p0, p1), 0.85)
-    for tc in (4.7, 5.6, 7.0, 7.5, 8.4):
+    sfx.add(6.88, glitch_sfx(0.24), 0.7)
+    for tc in (4.7, 7.5):
         sfx.add(tc, impact(0.35), 0.28)
     # cierre
     sfx.add(11.0, riser(1.0), 0.5)
@@ -106,6 +117,6 @@ def build():
 if __name__ == "__main__":
     out = sys.argv[1]; os.makedirs(out, exist_ok=True)
     m, d, s = build()
-    write_wav(f"{out}/reel_mix.wav", master(m * 0.6 + d * 0.65 + s * 0.85))
+    write_wav(f"{out}/reel_mix.wav", master(m * 0.85 + d * 0.8 + s * 0.7))
     write_wav(f"{out}/reel_sfx.wav", master(s * 0.85))
     print("audio reel listo")

@@ -117,13 +117,17 @@ def whip(t, t0, dur, ka, kb, vec):
     return acc / n
 
 
-def glitch(t, t0=2.72, t1=3.02):
+def glitch(t, t0=2.72, t1=3.02, ka=None, kb=None):
     """Bloques de píxeles que se desplazan y se estiran (datamosh) mezclando las dos tomas."""
     u = clamp01((t - t0) / (t1 - t0))
     I = math.sin(math.pi * u)
-    fa, fb = draw_hook_text(shot_frame("hook", t), t), shot_frame("A", max(t, 2.9))
-    if u > 0.55:
-        fb = draw_secret(fb, max(t, 2.92))
+    if ka is None:
+        fa, fb = draw_hook_text(shot_frame("hook", t), t), shot_frame("A", max(t, 2.9))
+        if u > 0.55:
+            fb = draw_secret(fb, max(t, 2.92))
+    else:
+        tc = (t0 + t1) / 2
+        fa, fb = shot_frame(ka, min(t, tc - 0.001)), shot_frame(kb, max(t, tc))
     pb = ease_io((u - 0.25) / 0.5)
     rng = np.random.default_rng(int(t * 1000))
     out = np.empty_like(fa)
@@ -183,7 +187,10 @@ def word(f, t, t0, t1, text, path, size, cx, cy, color="white", track=0.0, shado
         reg = f[ya:yb, xa:xb]
         f[ya:yb, xa:xb] = reg * (1 - mm) + np.abs(1 - reg) * mm
         return f
-    col = wine_grad(mh, mw) if color == "wine" else WHITE
+    col = wine_grad(mh, mw) if color == "wine" else (common.gold_fill(mh, mw) if color == "gold" else WHITE)
+    if color in ("white", "gold"):  # contorno oscuro suave para que se lea sobre cualquier fondo
+        ring = Image.fromarray((m * 255).astype(np.uint8)).filter(ImageFilter.MaxFilter(7)).filter(ImageFilter.GaussianBlur(3))
+        f = put_layer(f, np.asarray(ring, np.float32) / 255, np.array([0.05, 0.02, 0.02], np.float32), x0, y0, 0.55 * alpha, shadow=0)
     return put_layer(f, m, col, x0, y0, alpha, shadow=shadow)
 
 
@@ -298,13 +305,36 @@ def end_card(t):
 
 # ------------------------------------------------------------------ línea de tiempo
 CUTS = {  # transición entrante -> tipo
-    3.6: ("whip", (0, 1)), 6.4: ("whip", (0, -1)), 7.8: ("whip", (1, 1)), 10.2: ("whip", (1, 0)),
+    3.6: ("whip", (0, 1)), 5.6: ("whip", (1, 0)), 6.4: ("whip", (0, -1)), 7.8: ("whip", (1, 1)),
+    8.4: ("whip", (-1, 1)), 10.2: ("whip", (1, 0)),
 }
+GLITCHES = [(6.88, 7.12, "E", "F")]  # glitch corto extra, como el de la referencia
+
+# subtítulos palabra por palabra en el centro (letra serif cursiva), las claves en dorado
+CAPS = [
+    ("vinos", 3.65, 3.95, ""), ("elegidos", 3.95, 4.35, "gold"), ("uno", 4.35, 4.6, ""), ("por", 4.6, 4.8, ""),
+    ("uno.", 4.8, 5.25, ""), ("destilados", 5.3, 5.75, "gold"), ("para", 5.75, 5.95, ""), ("cada", 5.95, 6.2, ""),
+    ("ocasión.", 6.2, 6.75, "gold"), ("regalos", 6.8, 7.2, "gold"), ("que", 7.2, 7.4, ""),
+    ("sorprenden.", 7.4, 8.0, ""), ("todo", 8.1, 8.4, ""), ("en", 8.4, 8.55, ""), ("un", 8.55, 8.7, ""),
+    ("solo", 8.7, 9.0, ""), ("lugar.", 9.0, 9.5, "gold"), ("vení", 9.6, 9.9, ""), ("a", 9.9, 10.0, ""),
+    ("conocernos", 10.0, 10.6, "gold"), ("o", 10.65, 10.8, ""), ("pedilo", 10.8, 11.1, ""), ("a", 11.1, 11.2, ""),
+    ("domicilio.", 11.2, 11.9, "gold"),
+]
+
+
+def captions(f, t):
+    for w, t0, t1, c in CAPS:
+        if t0 <= t < t1:
+            f = word(f, t, t0, t1, w, SERIF_I, 150, 540, 1000, c or "white", out=0.05)
+    return f
 
 
 def frame_at(t):
+    g = [x for x in GLITCHES if x[0] <= t < x[1]]
     if 2.72 <= t < 3.02:
         f = glitch(t)
+    elif g:
+        f = glitch(t, *g[0])
     else:
         f = None
         for tc, (kind, vec) in CUTS.items():
@@ -322,6 +352,8 @@ def frame_at(t):
                     f = draw_hook_text(f, t)
                 if key == "A":
                     f = draw_secret(f, t)
+    if 3.6 <= t < 12.0:
+        f = captions(f, t)
     f = watermark(f, t)
     return f
 
