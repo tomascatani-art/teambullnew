@@ -162,7 +162,7 @@ def wine_grad(h, w):
     return np.broadcast_to(top * (1 - y) + bot * y, (h, w, 3)).copy()
 
 
-def word(f, t, t0, t1, text, path, size, cx, cy, color="white", track=0.0, shadow=0.35, out=0.08):
+def word(f, t, t0, t1, text, path, size, cx, cy, color="white", track=0.0, shadow=0.6, out=0.08):
     """Palabra que aparece con rebote (escala con overshoot) y se va rápido."""
     if t < t0 or t >= t1:
         return f
@@ -211,7 +211,7 @@ def make_check(size=170):
     return Image.fromarray((rgba * 255).astype(np.uint8), "RGBA").resize((size, size), Image.LANCZOS)
 
 
-CHECK = make_check()
+CHECK = make_check(195)
 ICONS = [(250, 905, -12, 0.35), (850, 930, 14, 0.55), (300, 1210, 9, 0.75), (790, 1270, -10, 0.95)]
 TRAIL = [(330 + 520 * s + 120 * math.sin(s * 6), 1330 + 330 * s + 90 * math.cos(s * 5)) for s in np.linspace(0, 1, 60)]
 
@@ -246,10 +246,10 @@ def draw_hook_text(f, t):
         f = word(f, t, 0.05, 1.95, "lo tiene", SERIF_BI, 205, 540, 560, "wine", shadow=0.15)
         f = word(f, t, 0.0, 1.95, "una vinoteca que", SANS, 60, 470, 455, shadow=0.3)
         for t0, t1, w in ((0.35, 0.75, "todo:"), (0.75, 1.15, "vinos"), (1.15, 1.55, "destilados"), (1.55, 1.95, "regalos.")):
-            f = word(f, t, t0, t1, w, SERIF_I, 118, 540, 1075)
+            f = word(f, t, t0, t1, w, SERIF_I, 140, 540, 1075)
     elif t < 2.58:
-        f = word(f, t, 1.95, 2.58, "no podés evitar", SANS_B, 76, 540, 470)
-        f = word(f, t, 2.12, 2.58, "preguntarte.", SERIF_I, 128, 560, 610)
+        f = word(f, t, 1.95, 2.58, "no podés evitar", SANS_B, 78, 540, 930)
+        f = word(f, t, 2.12, 2.58, "preguntarte.", SERIF_I, 140, 560, 1070)
     else:
         f = word(f, t, 2.58, 3.0, "¿cuál es el", SERIF_I, 112, 540, 1040)
     return f
